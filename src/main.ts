@@ -76,6 +76,11 @@ const customStickerButton = document.createElement("button");
 customStickerButton.textContent = "Add Custom Sticker";
 customStickerButton.id = "custom-sticker-button";
 
+// Step 10 - Export Button -------------------------------------
+const exportButton = document.createElement("button");
+exportButton.textContent = "Export as PNG";
+exportButton.id = "export-button";
+
 // adding button container for better positioning
 const buttonContainer = document.createElement("div");
 buttonContainer.id = "button-container";
@@ -86,6 +91,7 @@ buttonContainer.appendChild(thinButton);
 buttonContainer.appendChild(thickButton);
 stickerButtons.forEach(button => buttonContainer.appendChild(button));
 buttonContainer.appendChild(customStickerButton);
+buttonContainer.appendChild(exportButton);
 app.appendChild(buttonContainer);
 
 // Step 5 - Marker Class -------------------------------------
@@ -203,6 +209,43 @@ customStickerButton.addEventListener('click', () => {
         // Add the new button to the button container
         buttonContainer.appendChild(button);
     }
+});
+
+// Step 10 - Export Button Handler -------------------------------------
+exportButton.addEventListener('click', () => {
+    // Create a new canvas and context
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = 1024;  // New canvas size
+    exportCanvas.height = 1024;
+
+    const exportCtx = exportCanvas.getContext("2d");
+    if (!exportCtx) return;
+
+    // Scale the context to fit the larger canvas (4x larger in each dimension)
+    exportCtx.scale(4, 4);
+
+    // Draw all items in the display list onto the new canvas
+    displayList.forEach((item) => {
+        if (item instanceof Marker) {
+            item.display(exportCtx);
+        } else if (item instanceof EmojiSticker) {
+            item.display(exportCtx);
+        }
+    });
+
+    // Trigger download of the canvas as PNG
+    exportCanvas.toBlob((blob) => {
+        if (blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sticker-export.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url); // Clean up the URL object
+        }
+    }, 'image/png');
 });
 
 // Step 6 - Thickness Styling -------------------------------------
