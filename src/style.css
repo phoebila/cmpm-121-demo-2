@@ -34,7 +34,9 @@ h1 {
   font-size: 3.2em;
   line-height: 1.1;
   color: #76b0db;
-  margin-bottom: 20px;
+  margin: 0;               /* Remove default margins */
+  margin-bottom: 10px;     /* Space between h1 and canvas */
+  text-align: center;      /* Center text */
 }
 
 /* Styling for the canvas */
@@ -42,29 +44,15 @@ h1 {
   border: 1px solid black; /* Thin black border */
   border-radius: 10px;     /* Rounded corners */
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);  /* Drop shadow effect */
-  margin-bottom: 20px;     /* Space between canvas and button */
-  position: relative;      /* Position relative to the canvas */
+  margin-right: 20px;     /* Space between canvas and button */
 }
 
-/* Styling for the clear button */
-#clear-button {
-  padding: 10px 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  background-color: #9ac1ea;
-  color: white;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-
-   /* Positioning the button relative to the canvas */
-   position: absolute;
-   top: 50%; /* Slightly higher than the middle */
-   right: 250px; /* Position to the right of the canvas */
-}
-
-#clear-button:hover {
-  background-color: #0056b3;
+/* Styling for the canvas container */
+#canvas-container {
+  display: flex;
+  flex-direction: column;  /* Stack children vertically */
+  align-items: center;      /* Center children horizontally */
+  margin-top: 20px;        /* Space above the container */
 }
 
 #app {
@@ -72,6 +60,9 @@ h1 {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  align-items: center;      /* Center the canvas and buttons vertically */
+  justify-content: center;  /* Center the entire app horizontally */
+  display: flex;
 }
 
 .logo {
@@ -94,6 +85,14 @@ h1 {
   color: #888;
 }
 
+/* Styling for the button container */
+#button-container {
+  display: flex;
+  flex-direction: column;  /* Stack buttons vertically */
+  gap: 10px;               /* Add space between buttons */
+  align-items: flex-start; /* Align buttons to the left inside the container */
+}
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -101,12 +100,12 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #9672ea;
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #672b87;
 }
 button:focus,
 button:focus-visible {
