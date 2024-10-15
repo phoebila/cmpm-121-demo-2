@@ -33,6 +33,15 @@ body {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  color: #76b0db;
+  margin-bottom: 20px;
+}
+
+/* Styling for the canvas */
+#sticker-canvas {
+  border: 1px solid black; /* Thin black border */
+  border-radius: 10px;     /* Rounded corners */
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);  /* Drop shadow effect */
 }
 
 #app {
