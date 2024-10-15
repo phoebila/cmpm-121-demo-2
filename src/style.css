@@ -39,6 +39,11 @@ h1 {
   text-align: center;      /* Center text */
 }
 
+.selectedTool {
+  background-color: #76b0db;; /* Change background color for selected tool */
+  color: white;               /* Change text color for better contrast */
+}
+
 /* Styling for the canvas */
 #sticker-canvas {
   border: 1px solid black; /* Thin black border */
@@ -91,6 +96,7 @@ h1 {
   flex-direction: column;  /* Stack buttons vertically */
   gap: 10px;               /* Add space between buttons */
   align-items: flex-start; /* Align buttons to the left inside the container */
+  margin-top: 90px; /* Adjust the value as needed */
 }
 
 button {

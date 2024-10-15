@@ -38,12 +38,23 @@ const redoButton = document.createElement("button");
 redoButton.textContent = "Redo";
 redoButton.id = "redo-button";
 
+// Step 6 - Thickness Styling -------------------------------------
+const thinButton = document.createElement("button");
+thinButton.textContent = "Thin Marker";
+thinButton.id = "thin-button";
+
+const thickButton = document.createElement("button");
+thickButton.textContent = "Thick Marker";
+thickButton.id = "thick-button";
+
 // adding button container for better positioning
 const buttonContainer = document.createElement("div");
 buttonContainer.id = "button-container";
 buttonContainer.appendChild(clearButton);
 buttonContainer.appendChild(undoButton);
 buttonContainer.appendChild(redoButton);
+buttonContainer.appendChild(thinButton);
+buttonContainer.appendChild(thickButton);
 app.appendChild(buttonContainer);
 
 // Step 5 - Marker Class -------------------------------------
@@ -52,12 +63,14 @@ class Marker {
     private startY: number;
     private endX: number;
     private endY: number;
+    private thickness: number;
 
-    constructor(startX: number, startY: number) {
+    constructor(startX: number, startY: number, thickness: number) {
         this.startX = startX;
         this.startY = startY;
         this.endX = startX; // Initially, the end point is the same as the start point
         this.endY = startY;
+        this.thickness = thickness;
     }
 
     drag(x: number, y: number) {
@@ -71,7 +84,7 @@ class Marker {
         ctx.moveTo(this.startX, this.startY);
         ctx.lineTo(this.endX, this.endY);
         ctx.strokeStyle = '#fff'; // You can customize the color
-        ctx.lineWidth = 2; // You can customize the line width
+        ctx.lineWidth = this.thickness; // You can customize the line width
         ctx.stroke();
         ctx.closePath();
     }
@@ -88,7 +101,7 @@ canvas.addEventListener("mousedown", (e) => {
     const y = e.clientY - rect.top;
 
     // Create a new marker line at the mouse position
-    currentLine = new Marker(x, y);
+    currentLine = new Marker(x, y, currThickness);
     displayList.push(currentLine);
 });
 
@@ -122,6 +135,29 @@ canvas.addEventListener("drawing-changed", () => {
         line.display(ctx);
     });
 });
+
+// Step 6 - Thickness Styling -------------------------------------
+let currThickness = 2;
+
+// event listeners
+thinButton.addEventListener('click', () => {
+    currThickness = 2;
+    updateToolSelection(thinButton)
+});
+
+thickButton.addEventListener('click', () => {
+    currThickness = 5;
+    updateToolSelection(thickButton)
+});
+
+function updateToolSelection(selectedButton: HTMLButtonElement) {
+    // Remove the selected class from all buttons
+    thinButton.classList.remove("selected");
+    thickButton.classList.remove("selected");
+
+    // Add the selected class to the clicked button
+    selectedButton.classList.add("selected");
+}
 
 // rewriting undo/redo logic    
 const undoStack: Marker[] = [];
