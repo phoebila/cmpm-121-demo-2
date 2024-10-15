@@ -94,6 +94,11 @@ class Marker {
 const displayList: Marker[] = [];
 let currentLine: Marker | null = null;
 
+// Preview variables
+let previewX: number = 0;
+let previewY: number = 0;
+let isMouseDown: boolean = false;
+
 // mouse handling
 canvas.addEventListener("mousedown", (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -103,24 +108,7 @@ canvas.addEventListener("mousedown", (e) => {
     // Create a new marker line at the mouse position
     currentLine = new Marker(x, y, currThickness);
     displayList.push(currentLine);
-});
-
-canvas.addEventListener("mousemove", (e) => {
-    if (!currentLine) return; // Do nothing if there's no current line
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    // Update the line's end point as the mouse moves
-    currentLine.drag(x, y);
-
-    // Dispatch a "drawing-changed" event to redraw the canvas
-    canvas.dispatchEvent(new Event("drawing-changed"));
-});
-
-canvas.addEventListener("mouseup", () => {
-    currentLine = null; // Finalize the current line
+    isMouseDown = true; // Set mouse down state
 });
 
 // Observer for the "drawing-changed" event
@@ -198,6 +186,55 @@ function clear(){
     // Dispatch a "drawing-changed" event to update the canvas (if needed)
     canvas.dispatchEvent(new Event("drawing-changed"));
 }
+
+// Step 7 - Tool Preview -------------------------------------
+canvas.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Update preview position
+    previewX = x;
+    previewY = y;
+
+    // Dispatch the "tool-moved" event
+    canvas.dispatchEvent(new Event("tool-moved"));
+
+    // If mouse is down, update the current line
+    if (isMouseDown && currentLine) {
+        currentLine.drag(x, y);
+        canvas.dispatchEvent(new Event("drawing-changed")); // Trigger redraw
+    }
+});
+
+// Observer for the "tool-moved" event
+canvas.addEventListener("tool-moved", () => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx || isMouseDown) return; // Don't draw preview if mouse is down
+
+    // Clear the canvas for the preview
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Redraw existing marker lines
+    displayList.forEach((line) => {
+        line.display(ctx);
+    });
+
+    // Draw the tool preview
+    ctx.beginPath();
+    ctx.arc(previewX, previewY, currThickness, 0, Math.PI * 2); // Draw a circle for preview
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; // Light gray color for preview
+    ctx.lineWidth = currThickness; // Match the current tool thickness
+    ctx.stroke();
+    ctx.closePath();
+});
+
+canvas.addEventListener("mouseup", () => {
+    if (currentLine) {
+        currentLine = null; // Finalize the current line
+    }
+    isMouseDown = false; // Reset mouse down state
+});
 
 // Add event listeners to undo and redo buttons
 undoButton.addEventListener('click', undo);
