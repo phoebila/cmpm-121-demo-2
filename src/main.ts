@@ -81,12 +81,27 @@ const exportButton = document.createElement("button");
 exportButton.textContent = "Export as PNG";
 exportButton.id = "export-button";
 
+// Step 12 - Color Picker -------------------------------------
+const colorInput = document.createElement("input");
+colorInput.type = "color"; // Use the color input type for selecting colors
+colorInput.value = "#ffffff"; // Default to white color
+
+// Step 12 - Slider Input -------------------------------------
+const slider = document.createElement("input");
+slider.type = "range";
+slider.min = "0";
+slider.max = "360";
+slider.value = "0"; // Default to 0
+slider.id = "hue-slider"; // Give an ID for easy reference
+
 // adding button container for better positioning
 const buttonContainer = document.createElement("div");
 buttonContainer.id = "button-container";
 buttonContainer.appendChild(clearButton);
 buttonContainer.appendChild(undoButton);
 buttonContainer.appendChild(redoButton);
+buttonContainer.appendChild(slider);
+buttonContainer.appendChild(colorInput);
 buttonContainer.appendChild(thinButton);
 buttonContainer.appendChild(thickButton);
 stickerButtons.forEach(button => buttonContainer.appendChild(button));
@@ -101,13 +116,15 @@ class Marker {
     private endX: number;
     private endY: number;
     private thickness: number;
+    private color: string; // New property for color
 
-    constructor(startX: number, startY: number, thickness: number) {
+    constructor(startX: number, startY: number, thickness: number, color: string) {
         this.startX = startX;
         this.startY = startY;
         this.endX = startX; // Initially, the end point is the same as the start point
         this.endY = startY;
         this.thickness = thickness;
+        this.color = color; // Set the color
     }
 
     drag(x: number, y: number) {
@@ -120,20 +137,31 @@ class Marker {
         ctx.beginPath();
         ctx.moveTo(this.startX, this.startY);
         ctx.lineTo(this.endX, this.endY);
-        ctx.strokeStyle = '#fff'; // You can customize the color
+        ctx.strokeStyle = this.color; // You can customize the color
         ctx.lineWidth = this.thickness; // You can customize the line width
         ctx.stroke();
         ctx.closePath();
     }
 }
 
+// Step 12 - Slider Input -------------------------------------
+let stickerRotation = 0; // Default rotation angle
+
+slider.addEventListener("input", (e) => {
+    stickerRotation = Number(slider.value); // Get the rotation value from the slider
+});
+
 // Step 8 - Sticker Class -------------------------------------
 class EmojiSticker {
-    constructor(public x: number, public y: number, public emoji: string) {}
+    constructor(public x: number, public y: number, public emoji: string, public rotation: number = 0) {}
     
     display(ctx: CanvasRenderingContext2D) {
+        ctx.save(); // Save the current context
+        ctx.translate(this.x, this.y); // Move to the sticker's position
+        ctx.rotate((this.rotation * Math.PI) / 180); // Convert degrees to radians
         ctx.font = '48px Arial'; // Adjust font size as necessary
-        ctx.fillText(this.emoji, this.x, this.y); // Draw the emoji
+        ctx.fillText(this.emoji, 0, 0); // Draw the emoji centered at the origin
+        ctx.restore(); // Restore the context
     }
 }
 
@@ -156,12 +184,14 @@ canvas.addEventListener("mousedown", (e) => {
 
     if (selectedEmoji) {
         // Place the selected emoji sticker
-        const newSticker = new EmojiSticker(x, y, selectedEmoji);
+        const newSticker = new EmojiSticker(x, y, selectedEmoji, stickerRotation);
         displayList.push(newSticker);
         currentEmoji = null; // Clear current emoji reference
     } else {
+        // Get the selected color from the color input
+        const selectedColor = colorInput.value; // Get the color
         // Create a new marker line at the mouse position
-        currentLine = new Marker(x, y, currThickness);
+        currentLine = new Marker(x, y, currThickness, selectedColor);
         displayList.push(currentLine);
     }
 
