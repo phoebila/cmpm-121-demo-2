@@ -47,6 +47,19 @@ const thickButton = document.createElement("button");
 thickButton.textContent = "Thick Marker";
 thickButton.id = "thick-button";
 
+// Step 8 - Emoji Stickers -------------------------------------
+const cowboyStickerButton = document.createElement("button");
+cowboyStickerButton.textContent = "🤠";
+cowboyStickerButton.id = "cowboy-button";
+
+const cactusStickerButton = document.createElement("button");
+cactusStickerButton.textContent = "🌵";
+cactusStickerButton.id = "cactus-button";
+
+const diceStickerButton = document.createElement("button");
+diceStickerButton.textContent = "🎲";
+diceStickerButton.id = "dice-button";
+
 // adding button container for better positioning
 const buttonContainer = document.createElement("div");
 buttonContainer.id = "button-container";
@@ -55,6 +68,9 @@ buttonContainer.appendChild(undoButton);
 buttonContainer.appendChild(redoButton);
 buttonContainer.appendChild(thinButton);
 buttonContainer.appendChild(thickButton);
+buttonContainer.appendChild(cowboyStickerButton);
+buttonContainer.appendChild(cactusStickerButton);
+buttonContainer.appendChild(diceStickerButton);
 app.appendChild(buttonContainer);
 
 // Step 5 - Marker Class -------------------------------------
@@ -90,14 +106,26 @@ class Marker {
     }
 }
 
+// Step 8 - Sticker Class -------------------------------------
+class EmojiSticker {
+    constructor(public x: number, public y: number, public emoji: string) {}
+    
+    display(ctx: CanvasRenderingContext2D) {
+        ctx.font = '48px Arial'; // Adjust font size as necessary
+        ctx.fillText(this.emoji, this.x, this.y); // Draw the emoji
+    }
+}
+
 // Rewriting marker lines with Marker class
-const displayList: Marker[] = [];
+const displayList: (Marker | EmojiSticker)[] = [];
 let currentLine: Marker | null = null;
+let currentEmoji: EmojiSticker | null = null;
 
 // Preview variables
 let previewX: number = 0;
 let previewY: number = 0;
 let isMouseDown: boolean = false;
+let selectedEmoji: string | null = null; // For selected emoji
 
 // mouse handling
 canvas.addEventListener("mousedown", (e) => {
@@ -105,9 +133,17 @@ canvas.addEventListener("mousedown", (e) => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Create a new marker line at the mouse position
-    currentLine = new Marker(x, y, currThickness);
-    displayList.push(currentLine);
+    if (selectedEmoji) {
+        // Place the selected emoji sticker
+        const newSticker = new EmojiSticker(x, y, selectedEmoji);
+        displayList.push(newSticker);
+        currentEmoji = null; // Clear current emoji reference
+    } else {
+        // Create a new marker line at the mouse position
+        currentLine = new Marker(x, y, currThickness);
+        displayList.push(currentLine);
+    }
+
     isMouseDown = true; // Set mouse down state
 });
 
@@ -118,9 +154,13 @@ canvas.addEventListener("drawing-changed", () => {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
 
-    // Redraw all marker lines
-    displayList.forEach((line) => {
-        line.display(ctx);
+    // Redraw all marker lines and stickers
+    displayList.forEach((item) => {
+        if (item instanceof Marker) {
+            item.display(ctx);
+        } else if (item instanceof EmojiSticker) {
+            item.display(ctx);
+        }
     });
 });
 
@@ -142,22 +182,25 @@ function updateToolSelection(selectedButton: HTMLButtonElement) {
     // Remove the selected class from all buttons
     thinButton.classList.remove("selected");
     thickButton.classList.remove("selected");
+    cowboyStickerButton.classList.remove("selected");
+    cactusStickerButton.classList.remove("selected");
+    diceStickerButton.classList.remove("selected");
 
     // Add the selected class to the clicked button
     selectedButton.classList.add("selected");
 }
 
 // rewriting undo/redo logic    
-const undoStack: Marker[] = [];
-const redoStack: Marker[] = [];
+const undoStack: (Marker | EmojiSticker)[] = [];
+const redoStack: (Marker | EmojiSticker)[] = [];
 
 function undo() {
     if (displayList.length === 0) return;
 
     // Pop the last line from the display list
-    const line = displayList.pop();
-    if (line) {
-        redoStack.push(line); // Add to redo stack
+    const item = displayList.pop();
+    if (item) {
+        redoStack.push(item); // Add to redo stack
         canvas.dispatchEvent(new Event("drawing-changed")); // Trigger redraw
     }
 }
@@ -166,9 +209,9 @@ function redo() {
     if (redoStack.length === 0) return;
 
     // Pop from the redo stack and add it back to the display list
-    const line = redoStack.pop();
-    if (line) {
-        displayList.push(line);
+    const item = redoStack.pop();
+    if (item) {
+        displayList.push(item);
         canvas.dispatchEvent(new Event("drawing-changed")); // Trigger redraw
     }
 }
@@ -215,18 +258,27 @@ canvas.addEventListener("tool-moved", () => {
     // Clear the canvas for the preview
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Redraw existing marker lines
-    displayList.forEach((line) => {
-        line.display(ctx);
+    // Redraw existing marker lines and stickers
+    displayList.forEach((item) => {
+        if (item instanceof Marker) {
+            item.display(ctx);
+        } else if (item instanceof EmojiSticker) {
+            item.display(ctx);
+        }
     });
 
     // Draw the tool preview
-    ctx.beginPath();
-    ctx.arc(previewX, previewY, currThickness, 0, Math.PI * 2); // Draw a circle for preview
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; // Light gray color for preview
-    ctx.lineWidth = currThickness; // Match the current tool thickness
-    ctx.stroke();
-    ctx.closePath();
+    if (selectedEmoji) {
+        ctx.font = '48px Arial'; // Match the emoji font size
+        ctx.fillText(selectedEmoji, previewX, previewY); // Draw a preview of the emoji
+    } else if (currThickness) {
+        ctx.beginPath();
+        ctx.arc(previewX, previewY, currThickness, 0, Math.PI * 2); // Draw a circle for preview
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; // Light gray color for preview
+        ctx.lineWidth = currThickness; // Match the current tool thickness
+        ctx.stroke();
+        ctx.closePath();
+    }
 });
 
 canvas.addEventListener("mouseup", () => {
@@ -234,6 +286,31 @@ canvas.addEventListener("mouseup", () => {
         currentLine = null; // Finalize the current line
     }
     isMouseDown = false; // Reset mouse down state
+});
+
+// Step 8 - Emoji button event listeners -------------------------------------
+// Set the selected emoji on button click
+cowboyStickerButton.addEventListener('click', () => {
+    selectedEmoji = "🤠"; // Set the emoji to cowboy
+    updateToolSelection(cowboyStickerButton);
+});
+
+cactusStickerButton.addEventListener('click', () => {
+    selectedEmoji = "🌵"; // Set the emoji to cactus
+    updateToolSelection(cactusStickerButton);
+});
+
+diceStickerButton.addEventListener('click', () => {
+    selectedEmoji = "🎲"; // Set the emoji to dice
+    updateToolSelection(diceStickerButton);
+});
+
+// Deselect emoji when clicking outside of the buttons (optional)
+document.addEventListener('click', (event) => {
+    if (!(event.target instanceof HTMLButtonElement) || 
+        !event.target.closest('#button-container')) {
+        selectedEmoji = null; // Deselect emoji if clicking outside the button container
+    }
 });
 
 // Add event listeners to undo and redo buttons
