@@ -71,6 +71,10 @@ stickerData.forEach(sticker => {
     stickerButtons.push(button);
 });
 
+// Step 9 - Custom Stickers -------------------------------------
+const customStickerButton = document.createElement("button");
+customStickerButton.textContent = "Add Custom Sticker";
+customStickerButton.id = "custom-sticker-button";
 
 // adding button container for better positioning
 const buttonContainer = document.createElement("div");
@@ -81,6 +85,7 @@ buttonContainer.appendChild(redoButton);
 buttonContainer.appendChild(thinButton);
 buttonContainer.appendChild(thickButton);
 stickerButtons.forEach(button => buttonContainer.appendChild(button));
+buttonContainer.appendChild(customStickerButton);
 app.appendChild(buttonContainer);
 
 // Step 5 - Marker Class -------------------------------------
@@ -172,6 +177,32 @@ canvas.addEventListener("drawing-changed", () => {
             item.display(ctx);
         }
     });
+});
+
+// Step 9 - Custom Sticker Handler -------------------------------------
+customStickerButton.addEventListener('click', () => {
+    const emoji = prompt("Enter a sticker emoji:", "😀"); // Default emoji for prompt
+    if (emoji) {
+        // Create a new sticker object
+        const newSticker = { emoji, label: `Custom ${stickerData.length + 1}` };
+
+        // Add the new sticker to the sticker data array
+        stickerData.push(newSticker);
+
+        // Create a new button for the custom sticker
+        const button = document.createElement("button");
+        button.textContent = newSticker.emoji;
+        button.id = `${newSticker.label.toLowerCase()}-button`;
+
+        // Add an event listener to set the selected emoji
+        button.addEventListener('click', () => {
+            selectedEmoji = newSticker.emoji; // Set the emoji to the selected one
+            updateToolSelection(button);
+        });
+
+        // Add the new button to the button container
+        buttonContainer.appendChild(button);
+    }
 });
 
 // Step 6 - Thickness Styling -------------------------------------
