@@ -42,6 +42,29 @@ h1 {
   border: 1px solid black; /* Thin black border */
   border-radius: 10px;     /* Rounded corners */
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);  /* Drop shadow effect */
+  margin-bottom: 20px;     /* Space between canvas and button */
+  position: relative;      /* Position relative to the canvas */
+}
+
+/* Styling for the clear button */
+#clear-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #9ac1ea;
+  color: white;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+
+   /* Positioning the button relative to the canvas */
+   position: absolute;
+   top: 50%; /* Slightly higher than the middle */
+   right: 250px; /* Position to the right of the canvas */
+}
+
+#clear-button:hover {
+  background-color: #0056b3;
 }
 
 #app {
