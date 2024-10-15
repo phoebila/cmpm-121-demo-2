@@ -48,17 +48,29 @@ thickButton.textContent = "Thick Marker";
 thickButton.id = "thick-button";
 
 // Step 8 - Emoji Stickers -------------------------------------
-const cowboyStickerButton = document.createElement("button");
-cowboyStickerButton.textContent = "🤠";
-cowboyStickerButton.id = "cowboy-button";
+ // Refactored JSON style data to array
+const stickerData = [
+    { emoji: "🤠", label: "Cowboy" },
+    { emoji: "🌵", label: "Cactus" },
+    { emoji: "🎲", label: "Dice" },
+];
 
-const cactusStickerButton = document.createElement("button");
-cactusStickerButton.textContent = "🌵";
-cactusStickerButton.id = "cactus-button";
+// Create sticker buttons dynamically based on the sticker data
+const stickerButtons: HTMLButtonElement[] = [];
+stickerData.forEach(sticker => {
+    const button = document.createElement("button");
+    button.textContent = sticker.emoji;
+    button.id = `${sticker.label.toLowerCase()}-button`;
 
-const diceStickerButton = document.createElement("button");
-diceStickerButton.textContent = "🎲";
-diceStickerButton.id = "dice-button";
+    // Add an event listener to set the selected emoji
+    button.addEventListener('click', () => {
+        selectedEmoji = sticker.emoji; // Set the emoji to the selected one
+        updateToolSelection(button);
+    });
+
+    stickerButtons.push(button);
+});
+
 
 // adding button container for better positioning
 const buttonContainer = document.createElement("div");
@@ -68,9 +80,7 @@ buttonContainer.appendChild(undoButton);
 buttonContainer.appendChild(redoButton);
 buttonContainer.appendChild(thinButton);
 buttonContainer.appendChild(thickButton);
-buttonContainer.appendChild(cowboyStickerButton);
-buttonContainer.appendChild(cactusStickerButton);
-buttonContainer.appendChild(diceStickerButton);
+stickerButtons.forEach(button => buttonContainer.appendChild(button));
 app.appendChild(buttonContainer);
 
 // Step 5 - Marker Class -------------------------------------
@@ -182,10 +192,7 @@ function updateToolSelection(selectedButton: HTMLButtonElement) {
     // Remove the selected class from all buttons
     thinButton.classList.remove("selected");
     thickButton.classList.remove("selected");
-    cowboyStickerButton.classList.remove("selected");
-    cactusStickerButton.classList.remove("selected");
-    diceStickerButton.classList.remove("selected");
-
+    stickerButtons.forEach(button => button.classList.remove("selected"));
     // Add the selected class to the clicked button
     selectedButton.classList.add("selected");
 }
@@ -286,23 +293,6 @@ canvas.addEventListener("mouseup", () => {
         currentLine = null; // Finalize the current line
     }
     isMouseDown = false; // Reset mouse down state
-});
-
-// Step 8 - Emoji button event listeners -------------------------------------
-// Set the selected emoji on button click
-cowboyStickerButton.addEventListener('click', () => {
-    selectedEmoji = "🤠"; // Set the emoji to cowboy
-    updateToolSelection(cowboyStickerButton);
-});
-
-cactusStickerButton.addEventListener('click', () => {
-    selectedEmoji = "🌵"; // Set the emoji to cactus
-    updateToolSelection(cactusStickerButton);
-});
-
-diceStickerButton.addEventListener('click', () => {
-    selectedEmoji = "🎲"; // Set the emoji to dice
-    updateToolSelection(diceStickerButton);
 });
 
 // Deselect emoji when clicking outside of the buttons (optional)
