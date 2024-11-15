@@ -25,27 +25,25 @@ container.appendChild(canvas);
 app.appendChild(container);
 
 // Step 2 - Clear Button and Draw Handler -------------------------------------
-const clearButton = document.createElement("button");
-clearButton.textContent = "Clear";
-clearButton.id = "clear-button";
+// adding button container for better positioning
+const buttonContainer = document.createElement("div");
+buttonContainer.id = "button-container";
 
-// undo/redo buttons
-const undoButton = document.createElement("button");
-undoButton.textContent = "Undo";
-undoButton.id = "undo-button";
+function createButton(textContent: string, id: string) {
+    const button = document.createElement("button");
+    button.textContent = textContent;
+    button.id = id;
+    buttonContainer.appendChild(button)
+    return button
+}
 
-const redoButton = document.createElement("button");
-redoButton.textContent = "Redo";
-redoButton.id = "redo-button";
+const clearButton = createButton("Clear", "clear-button");
+const undoButton = createButton("Undo", "undo-button");
+const redoButton = createButton("Redo", "redo-button");
 
 // Step 6 - Thickness Styling -------------------------------------
-const thinButton = document.createElement("button");
-thinButton.textContent = "Thin Marker";
-thinButton.id = "thin-button";
-
-const thickButton = document.createElement("button");
-thickButton.textContent = "Thick Marker";
-thickButton.id = "thick-button";
+const thinButton = createButton("Thin Marker", "thin-button");
+const thickButton = createButton("Thick Marker", "thick-button");
 
 // Step 8 - Emoji Stickers -------------------------------------
  // Refactored JSON style data to array
@@ -72,14 +70,10 @@ stickerData.forEach(sticker => {
 });
 
 // Step 9 - Custom Stickers -------------------------------------
-const customStickerButton = document.createElement("button");
-customStickerButton.textContent = "Add Custom Sticker";
-customStickerButton.id = "custom-sticker-button";
+const customStickerButton = createButton("Add Custom Sticker", "custom-sticker-button");
 
 // Step 10 - Export Button -------------------------------------
-const exportButton = document.createElement("button");
-exportButton.textContent = "Export as PNG";
-exportButton.id = "export-button";
+const exportButton = createButton("Export as PNG", "export-button");
 
 // Step 12 - Color Picker -------------------------------------
 const colorInput = document.createElement("input");
@@ -94,19 +88,9 @@ slider.max = "360";
 slider.value = "0"; // Default to 0
 slider.id = "hue-slider"; // Give an ID for easy reference
 
-// adding button container for better positioning
-const buttonContainer = document.createElement("div");
-buttonContainer.id = "button-container";
-buttonContainer.appendChild(clearButton);
-buttonContainer.appendChild(undoButton);
-buttonContainer.appendChild(redoButton);
 buttonContainer.appendChild(slider);
 buttonContainer.appendChild(colorInput);
-buttonContainer.appendChild(thinButton);
-buttonContainer.appendChild(thickButton);
 stickerButtons.forEach(button => buttonContainer.appendChild(button));
-buttonContainer.appendChild(customStickerButton);
-buttonContainer.appendChild(exportButton);
 app.appendChild(buttonContainer);
 
 // Step 5 - Marker Class -------------------------------------
@@ -302,7 +286,6 @@ function updateToolSelection(selectedButton: HTMLButtonElement) {
 }
 
 // rewriting undo/redo logic    
-const undoStack: (Marker | EmojiSticker)[] = [];
 const redoStack: (Marker | EmojiSticker)[] = [];
 
 function undo() {
