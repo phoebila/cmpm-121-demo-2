@@ -25,15 +25,20 @@ container.appendChild(canvas);
 app.appendChild(container);
 
 // Step 2 - Clear Button and Draw Handler -------------------------------------
+//adding tool container for better positioning
+const toolContainer = document.createElement("div");
+toolContainer.id = "tool-container";
+
+
 // adding button container for better positioning
 const buttonContainer = document.createElement("div");
 buttonContainer.id = "button-container";
 
-function createButton(textContent: string, id: string) {
+function createButton(textContent: string, id: string, container: HTMLDivElement = buttonContainer) {
     const button = document.createElement("button");
     button.textContent = textContent;
     button.id = id;
-    buttonContainer.appendChild(button)
+    container.appendChild(button)
     return button
 }
 
@@ -42,10 +47,16 @@ const undoButton = createButton("Undo", "undo-button");
 const redoButton = createButton("Redo", "redo-button");
 
 // Step 6 - Thickness Styling -------------------------------------
-const thinButton = createButton("Thin Marker", "thin-button");
-const thickButton = createButton("Thick Marker", "thick-button");
+const lineContainer = document.createElement("div");
+lineContainer.id = "button-container";
+
+const thinButton = createButton("Thin Marker", "thin-button", lineContainer);
+const thickButton = createButton("Thick Marker", "thick-button", lineContainer);
 
 // Step 8 - Emoji Stickers -------------------------------------
+const stickerContainer = document.createElement("div");
+stickerContainer.id = "button-container";
+
  // Refactored JSON style data to array
 const stickerData = [
     { emoji: "🤠", label: "Cowboy" },
@@ -70,10 +81,10 @@ stickerData.forEach(sticker => {
 });
 
 // Step 9 - Custom Stickers -------------------------------------
-const customStickerButton = createButton("Add Custom Sticker", "custom-sticker-button");
+const customStickerButton = createButton("Add Custom Sticker", "custom-sticker-button", stickerContainer);
 
 // Step 10 - Export Button -------------------------------------
-const exportButton = createButton("Export as PNG", "export-button");
+const exportButton = createButton("Export as PNG", "export-button", container);
 
 // Step 12 - Color Picker -------------------------------------
 const colorInput = document.createElement("input");
@@ -88,10 +99,14 @@ slider.max = "360";
 slider.value = "0"; // Default to 0
 slider.id = "hue-slider"; // Give an ID for easy reference
 
-buttonContainer.appendChild(slider);
+
 buttonContainer.appendChild(colorInput);
-stickerButtons.forEach(button => buttonContainer.appendChild(button));
-app.appendChild(buttonContainer);
+stickerButtons.forEach(button => stickerContainer.appendChild(button));
+stickerContainer.appendChild(slider);
+toolContainer.appendChild(buttonContainer);
+toolContainer.appendChild(lineContainer);
+toolContainer.appendChild(stickerContainer);
+app.appendChild(toolContainer);
 
 // Step 5 - Marker Class -------------------------------------
 class Marker {

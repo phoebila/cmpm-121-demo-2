@@ -90,13 +90,17 @@ h1 {
   color: #888;
 }
 
+#tool-container{
+  flex-direction: column;  /* Stack subcontainers vertically */
+  align-items: flex-start; /* Align buttons to the left inside the container */
+}
+
 /* Styling for the button container */
 #button-container {
-  display: flex;
-  flex-direction: column;  /* Stack buttons vertically */
-  gap: 10px;               /* Add space between buttons */
-  align-items: flex-start; /* Align buttons to the left inside the container */
-  margin-top: 90px; /* Adjust the value as needed */
+  display:flex;   /* Display buttons in a single line */
+  flex-direction: row;  /* Display buttons horizontally */
+  align-items:center; /* Align buttons to the left inside the container */
+  margin-top: 10px; /* Adjust the value as needed */
 }
 
 button {
